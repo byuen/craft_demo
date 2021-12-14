@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @RestController
@@ -89,12 +90,27 @@ public class JobController {
             @ApiResponse(code = 200, message = "Ok", response = Job.class),
             @ApiResponse(code = 404, message = "Not Found"),
             @ApiResponse(code = 500, message = "Unexpected Error")})
-    public ResponseEntity<Job> createBid(@PathVariable("id") String id, @RequestBody BidRequest bidRequest) {
+    public ResponseEntity<?> createBid(@PathVariable("id") String id, @RequestBody BidRequest bidRequest) {
 
-        Optional job = jobService.getJob(id);
+        Optional optionalJob = jobService.getJob(id);
 
-        if (job.isPresent()) {
-            return new ResponseEntity<Job>(bidService.createBid((Job) job.get(), bidRequest), HttpStatus.CREATED);
+        if(false){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("bid to higher than lowest bid");
+        }
+
+        if (optionalJob.isPresent()) {
+
+            Job job = (Job) optionalJob.get();
+
+            if(!job.isActive()){
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("job is expired");
+            }
+
+            if((new BigDecimal(bidRequest.getBid())).compareTo(job.getLastBid().getAmount()) > 0 ){
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("bid to higher than lowest bid");
+            }
+
+            return new ResponseEntity<Job>(bidService.createBid((Job) job, bidRequest), HttpStatus.CREATED);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }

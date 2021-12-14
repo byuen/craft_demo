@@ -65,7 +65,17 @@ function submitPost(e){
           'Content-type':'application/json'
         },
         body:JSON.stringify({firstName:firstName, lastName:lastName, email:email,phone:phone, bid:bid})
-      })
+      }).then((res) => {
+          if (!res.ok) {
+
+           return res.text().then(text => {
+           document.getElementById('error').innerHTML = new Error(text);
+          });
+            throw new Error(res.text());
+          } else {
+          return res;
+          }
+        })
       .then((res) => res.json())
         .then((data=>{
            let output = "";
@@ -89,9 +99,13 @@ function submitPost(e){
 
           `;
             document.getElementById('posts').innerHTML = output;
-        }))
+            window.location.href = 'http://localhost:8080/create_bid.html?id='+ id;
+        })).catch((error) => {
+             console.log(error)
+           });
 
-         window.location.href = 'http://localhost:8080/create_bid.html?id='+ id;
+
+
     }
 
 getPosts();

@@ -34,6 +34,17 @@ public class BidService {
 
 
     public Job createBid(Job job, BidRequest bidRequest) {
+
+        //TODO: throw error
+        if(!job.isActive()){
+            return null;
+        }
+
+        //TODO: throw error
+        if((new BigDecimal(bidRequest.getBid())).compareTo(job.getLastBid().getAmount()) > 0 ){
+            return null;
+
+        }
         Person bidder = personService.createPerson(new Person(bidRequest.getFirstName(), bidRequest.getLastName(), bidRequest.getEmail(), bidRequest.getPhone()));
         Bid bid = new Bid(new BigDecimal(bidRequest.getBid()), job, bidder);
         bid.setBidTimestamp(LocalDateTime.now());

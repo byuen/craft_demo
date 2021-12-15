@@ -104,7 +104,7 @@ public class JobController {
             }
 
             if((new BigDecimal(bidRequest.getBid())).compareTo(job.getLastBid().getAmount()) > 0 ){
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("bid to higher than lowest bid");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("bid is higher than lowest bid");
             }
 
             return new ResponseEntity<Job>(bidService.createBid((Job) job, bidRequest), HttpStatus.CREATED);

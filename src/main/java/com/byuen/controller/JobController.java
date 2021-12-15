@@ -94,9 +94,6 @@ public class JobController {
 
         Optional optionalJob = jobService.getJob(id);
 
-        if(false){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("bid to higher than lowest bid");
-        }
 
         if (optionalJob.isPresent()) {
 
